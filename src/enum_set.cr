@@ -24,7 +24,7 @@ class EnumSet(T)
     unless T.size > 0
       raise "Size of #{T} must be greater than 0"
     end
-    @mask = 0i64
+    @mask = 0u64
     args.each { |a| self << a }
   end
 

@@ -1,13 +1,13 @@
 class Mutex
-  def owned?
+  def owned? : Bool
     @mutex_fiber == Fiber.current
   end
 
-  def locked?
+  def locked? : Bool
     !!@mutex_fiber
   end
 
-  def lock?
+  def lock? : Bool
     if locked?
       return false
     end

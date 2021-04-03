@@ -22,11 +22,7 @@ module Concurrent
     end
 
     def select_values(& : V ->) : ::Array(V)
-      sync do
-        ret = [] of V
-        @hash.each_value { |v| ret << v if yield v }
-        ret
-      end
+      sync { @hash.select_values { |v| yield v } }
     end
 
     def transform_values!
@@ -111,6 +107,14 @@ module Concurrent
 
     def dig?(key, *subkeys)
       sync { @hash.dig?(key, *subkeys) }
+    end
+
+    def store_if_absent(key : K, value : V)
+      sync { @hash.store_if_absent(key, value) }
+    end
+
+    def store_if_absent(key : K, & : -> V)
+      sync { @hash.store_if_absent(key) { yield } }
     end
   end
 end

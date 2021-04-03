@@ -1,7 +1,7 @@
 # Allows reading from a DB::ResultSet using column names (as strings or symbols)
-# or indexes instead of sequentially.
+# instead of sequentially.
 struct ResultSetReader
-  private alias KeyType = String | Int::Primitive | Symbol
+  private alias KeyType = String | Symbol
   private alias ValueType = String | Bool | Time | Bytes | Number::Primitive?
 
   private record Entry, column_name : String, value : ValueType
@@ -76,9 +76,5 @@ struct ResultSetReader
     end
 
     raise KeyError.new("Column '#{key}' was not selected")
-  end
-
-  private def get(idx : Int) : ValueType
-    @data[idx &- 1].value
   end
 end

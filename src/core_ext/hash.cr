@@ -30,6 +30,14 @@ class Hash(K, V)
     ret
   end
 
+  def store_if_absent(key : K, value : V)
+    store_if_absent(key) { value }
+  end
+
+  def store_if_absent(key : K, & : -> V)
+    has_key?(key) ? self[key] : (self[key] = yield)
+  end
+
   struct LocalEntryIterator(K, V)
     include BaseIterator
     include Iterator({K, V})
