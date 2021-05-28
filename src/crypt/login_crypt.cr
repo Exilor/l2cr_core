@@ -1,7 +1,7 @@
 require "./new_crypt"
 
 class LoginCrypt
-  def initialize(key)
+  def initialize(key : Bytes | String)
     @crypt = NewCrypt.new(key)
     @static_crypt = NewCrypt.new
   end

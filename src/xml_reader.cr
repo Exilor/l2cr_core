@@ -1,15 +1,9 @@
 require "xml"
 
 module XMLReader
-  macro extended
-    include Loggable
-  end
+  include Loggable
 
-  macro included
-    include Loggable
-  end
-
-  # abstract def parse_document(node : XML::Node, file : File)
+  abstract def parse_document(node : XML::Node, file : File)
 
   def self.parse_file(path : String, & : XML::Node, File ->) : Nil
     File.open(path) { |file| parse_file(file) { |doc| yield doc, file } }
@@ -91,7 +85,7 @@ module XMLReader
     node[key]
   end
 
-  private def parse_string(node : XML::Node, key : String, default)
+  private def parse_string(node : XML::Node, key : String, default : T) : String | T forall T
     node[key]? || default
   end
 
@@ -99,7 +93,7 @@ module XMLReader
     node[key].to_i8
   end
 
-  private def parse_byte(node : XML::Node, key : String, default)
+  private def parse_byte(node : XML::Node, key : String, default : T) : Int8 | T forall T
     if val = node[key]?
       return val.to_i8
     end
@@ -111,7 +105,7 @@ module XMLReader
     node[key].to_i16
   end
 
-  private def parse_short(node : XML::Node, key : String, default)
+  private def parse_short(node : XML::Node, key : String, default : T) : Int16 | T forall T
     if val = node[key]?
       return val.to_i16
     end
@@ -123,7 +117,7 @@ module XMLReader
     node[key].to_i32
   end
 
-  private def parse_int(node : XML::Node, key : String, default)
+  private def parse_int(node : XML::Node, key : String, default : T) : Int32 | T forall T
     if val = node[key]?
       return val.to_i32
     end
@@ -135,7 +129,7 @@ module XMLReader
     node[key].to_i64
   end
 
-  private def parse_long(node : XML::Node, key : String, default)
+  private def parse_long(node : XML::Node, key : String, default : T) : Int64 | T forall T
     if val = node[key]?
       return val.to_i64
     end
@@ -147,7 +141,7 @@ module XMLReader
     node[key].to_f32
   end
 
-  private def parse_float(node : XML::Node, key : String, default)
+  private def parse_float(node : XML::Node, key : String, default : T) : Float32 | T forall T
     if val = node[key]?
       return val.to_f32
     end
@@ -159,7 +153,7 @@ module XMLReader
     node[key].to_f64
   end
 
-  private def parse_double(node : XML::Node, key : String, default)
+  private def parse_double(node : XML::Node, key : String, default : T) : Float64 | T forall T
     if val = node[key]?
       return val.to_f64
     end
@@ -171,7 +165,7 @@ module XMLReader
     node[key].to_b
   end
 
-  private def parse_bool(node : XML::Node, key : String, default)
+  private def parse_bool(node : XML::Node, key : String, default : T) : Bool | T forall T
     if val = node[key]?
       return val.to_b
     end
@@ -179,11 +173,11 @@ module XMLReader
     default
   end
 
-  private def parse_enum(node : XML::Node, key : String, enum_type)
+  private def parse_enum(node : XML::Node, key : String, enum_type : E.class) : E forall E
     enum_type.parse(node[key])
   end
 
-  private def parse_enum(node : XML::Node, key : String, enum_type, default)
+  private def parse_enum(node : XML::Node, key : String, enum_type : E.class, default : T) : E | T forall E, T
     if val = node[key]?
       return enum_type.parse(val)
     end

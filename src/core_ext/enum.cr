@@ -11,8 +11,8 @@ struct Enum
     {{@type.constants.size}}
   end
 
-  def mask : UInt32
-    1u32 << to_i
+  def mask : UInt64
+    1u64 << to_i
   end
 
   def self.mask : UInt64

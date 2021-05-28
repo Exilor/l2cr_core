@@ -2,11 +2,11 @@ require "./packet"
 
 abstract class MMO::IncomingPacket(T) < MMO::Packet(T)
   private def c : Int32
-    buffer.read_bytes(UInt8).to_i32
+    buffer.read_bytes(UInt8).to_i32!
   end
 
   private def h : Int32
-    buffer.read_bytes(UInt16, BYTE_FORMAT).to_i32
+    buffer.read_bytes(UInt16, BYTE_FORMAT).to_i32!
   end
 
   private def d : Int32
@@ -23,14 +23,14 @@ abstract class MMO::IncomingPacket(T) < MMO::Packet(T)
 
   private def s : String
     offset = buffer.pos
-    count = 0
-    char = h
+    bytesize = 0
+    char = buffer.read_bytes(UInt16, BYTE_FORMAT)
     until char.zero?
-      count &+= 2
-      char = h
+      bytesize &+= 2
+      char = buffer.read_bytes(UInt16, BYTE_FORMAT)
     end
 
-    String.new((buffer.to_unsafe + offset).to_slice(count), "UTF-16LE")
+    String.new((buffer.to_unsafe + offset).to_slice(bytesize), "UTF-16LE")
   end
 
   private def b(size : Int) : Bytes

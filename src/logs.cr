@@ -3,10 +3,10 @@ require "colorize"
 module Logs
   extend self
 
-  private LOGGERS = {} of Symbol => Logger
+  private LOGGERS = Concurrent::Map(Symbol, Logger).new
 
   def [](log_name : Symbol) : Logger
-    LOGGERS[log_name] ||= begin
+    LOGGERS.store_if_absent(log_name) do
       time = Time.local.to_s("%Y-%m-%d")
       Dir.mkdir_p("#{Dir.current}/logs/#{log_name}/")
       file = File.open("#{Dir.current}/logs/#{log_name}/#{time}.log", "a")
@@ -16,7 +16,7 @@ module Logs
         time.to_s(io, " [%H:%M:%S] [")
         io << subject << "] " << msg
       end
-      logger.level = Config.debug ? Logger::Severity::DEBUG : Logger::Severity::INFO
+      logger.level = Logger::Severity::DEBUG
       logger
     end
   end
@@ -99,12 +99,12 @@ module Logs
     ConsoleLogger.error(subject, msg)
   end
 
-  def debug? : Bool
-    Config.debug
-  end
-
   private def to_msg(msg)
     msg.is_a?(Exception) ? msg.inspect_with_backtrace : msg
+  end
+
+  def debug? : Bool
+    Config.debug
   end
 
   private module ConsoleLogger
@@ -122,9 +122,7 @@ module Logs
       LOCK.synchronize do
         Time.local.to_s(STDOUT, "[%H:%M:%S] ")
         if subject
-          STDOUT << '[' << subject << "] "
-        else
-          STDOUT << ' '
+          STDOUT.print('[', subject, "] ")
         end
         STDOUT.puts(msg.colorize(color))
       end

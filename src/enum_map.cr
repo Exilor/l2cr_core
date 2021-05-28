@@ -1,5 +1,7 @@
 # Hash-like type optimized for Enum and EnumClass keys.
 class EnumMap(K, V)
+  include Enumerable({K, V})
+
   private class NoValue
     INSTANCE = new
   end
@@ -24,11 +26,11 @@ class EnumMap(K, V)
     end
   end
 
-  def each_value
+  def each_value(& : V ->)
     each { |k, v| yield v }
   end
 
-  def each_key
+  def each_key(& : K ->)
     K.size.times { |i| yield K[i] }
   end
 
@@ -205,7 +207,7 @@ class EnumMap(K, V)
     end
   end
 
-  def clear
+  def clear : self
     @data = Pointer(V | NoValue).null
     self
   end
@@ -243,6 +245,11 @@ class EnumMap(K, V)
     false
   end
 
+  def has_key?(key) : Bool
+    return false unless key.is_a?(K) && @data
+    !@data[key.to_i].is_a?(NoValue)
+  end
+
   def dig?(key : K, *subkeys)
     if (value = self[key]?) && value.responds_to?(:dig?)
       value.dig?(*subkeys)
@@ -253,21 +260,16 @@ class EnumMap(K, V)
     self[key]?
   end
 
-  def has_key?(key) : Bool
-    return false unless key.is_a?(K) && @data
-    !@data[key.to_i].is_a?(NoValue)
-  end
-
   def dig(key : K, *subkeys)
     if (value = self[key]) && value.responds_to?(:dig)
       return value.dig(*subkeys)
     end
 
-    raise KeyError.new "EnumMap value not diggable for key: #{key.inspect}"
+    raise KeyError.new("EnumMap value not diggable for key: #{key.inspect}")
   end
 
   def key_for(value)
-    key_for(value) { raise KeyError.new "Missing EnumMap key for value: #{value}" }
+    key_for(value) { raise KeyError.new("Missing EnumMap key for value: #{value}") }
   end
 
   def key_for?(value)
@@ -277,6 +279,14 @@ class EnumMap(K, V)
   def key_for(value)
     each { |k, v| return k if v == value }
     yield value
+  end
+
+  def store_if_absent(key : K, value : V) : V
+    store_if_absent(key) { value }
+  end
+
+  def store_if_absent(key : K, & : -> V) : V
+    has_key?(key) ? self[key] : (self[key] = yield)
   end
 
   def hash(hasher)
@@ -292,13 +302,13 @@ class EnumMap(K, V)
     result.hash(hasher)
   end
 
-  def dup
+  def dup : self
     map = EnumMap(K, V).new
     each { |k, v| map[k] = v }
     map
   end
 
-  def clone
+  def clone : self
     map = EnumMap(K, V).new
     each { |k, v| map[k] = v.clone }
     map
@@ -310,19 +320,22 @@ class EnumMap(K, V)
     h
   end
 
+  def to_s(io : IO)
+    io.print("EnumMap(", K, ", ", V, ") {")
+    each_with_index do |(key, value), index|
+      io << ", " if index != 0
+      io.print(key, " => ", value)
+    end
+    io << "}"
+  end
+
   def inspect(io : IO)
-    io << "EnumMap("
-    K.inspect(io)
-    io << ", "
-    V.inspect(io)
-    io << ") {"
-    found_one = false
-    each do |key, value|
-      io << ", " if found_one
+    io.print("EnumMap(", K, ", ", V, ") {")
+    each_with_index do |(key, value), index|
+      io << ", " if index != 0
       key.inspect(io)
       io << " => "
       value.inspect(io)
-      found_one = true
     end
     io << "}"
   end

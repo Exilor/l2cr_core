@@ -2,7 +2,7 @@ struct SessionKey
   getter_initializer login_ok_1 : Int32, login_ok_2 : Int32, play_ok_1 : Int32,
     play_ok_2 : Int32
 
-  def check_login_pair(ok1, ok2)
+  def check_login_pair(ok1 : Int32, ok2 : Int32) : Bool
     @login_ok_1 == ok1 && @login_ok_2 == ok2
   end
 

@@ -4,6 +4,6 @@ struct Range(B, E)
   end
 
   def min : B | E
-    Math.max(@begin, @end)
+    Math.min(@begin, @end)
   end
 end

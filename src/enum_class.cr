@@ -39,8 +39,8 @@ abstract class EnumClass
       @to_i <=> other.@to_i
     end
 
-    def mask : UInt32
-      1u32 << @to_i
+    def mask : UInt64
+      1u64 << @to_i
     end
 
     def dup : self

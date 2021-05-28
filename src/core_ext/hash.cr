@@ -30,11 +30,11 @@ class Hash(K, V)
     ret
   end
 
-  def store_if_absent(key : K, value : V)
+  def store_if_absent(key : K, value : V) : V
     store_if_absent(key) { value }
   end
 
-  def store_if_absent(key : K, & : -> V)
+  def store_if_absent(key : K, & : -> V) : V
     has_key?(key) ? self[key] : (self[key] = yield)
   end
 

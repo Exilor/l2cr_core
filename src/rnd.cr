@@ -8,7 +8,7 @@ module Rnd
     {% type = "#{prefix}#{name[1..-1].id}".id %}
 
     def {{name.id}} : {{type}}
-      Random::Secure.rand({{type}}::MIN..{{type}}::MAX)
+      Random::Secure.rand({{type}})
     end
   {% end %}
 

@@ -3,7 +3,7 @@ class ByteBuffer < IO::Memory
     @buffer.to_slice(@capacity)
   end
 
-  def to_unsafe
+  def to_unsafe : UInt8*
     @buffer
   end
 

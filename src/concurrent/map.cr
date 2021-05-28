@@ -116,5 +116,9 @@ module Concurrent
     def store_if_absent(key : K, & : -> V)
       sync { @hash.store_if_absent(key) { yield } }
     end
+
+    def put(key : K, value : V)
+      sync { @hash.put(key, value) { |k| yield k } }
+    end
   end
 end

@@ -7,8 +7,9 @@ class PropertiesReader < StatsSet
     File.each_line(path) do |line|
       next if line.starts_with?('#')
       next unless line.includes?('=')
-      key, value = line.split('=')
-      key = key.strip
+      line = line.split('=')
+      key = line[0].strip
+      value = line[1..-1].join('=')
       value = value.strip
       self[key] = value
     end

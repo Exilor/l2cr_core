@@ -11,15 +11,7 @@ struct Timer
     (Time.monotonic - @time).to_f.round(precision)
   end
 
-  def s
-    (Time.monotonic - @time).to_i
-  end
-
-  def ms
-    (Time.monotonic - @time)
-  end
-
   def to_s(io : IO)
-    io << result(4)
+    io.printf("%.4f", (Time.monotonic - @time).to_f)
   end
 end

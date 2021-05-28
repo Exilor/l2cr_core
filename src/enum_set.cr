@@ -6,14 +6,13 @@ class EnumSet(T)
   def_equals_and_hash @mask
 
   def initialize(set : Bool = false)
-    if set
-      unless T.size > 0
-        raise "Size of #{T} must be greater than 0"
-      end
-      @mask = T.mask
-    else
-      @mask = 0u64
+    if T.size > 64
+      raise "#{T}'s mask wouldn't fit an UInt64"
+    elsif T.size == 0
+      raise "Size of #{T} must be greater than 0"
     end
+
+    @mask = set ? T.mask : 0u64
   end
 
   def initialize(mask : Int)

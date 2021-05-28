@@ -16,12 +16,7 @@ class MMO::Connection(T) < IO
     @manager = manager
     @socket = socket
     @address = socket.remote_address
-    begin
-      socket.tcp_nodelay = tcp_nodelay
-    rescue e
-      error "Couldn't set tcp_nodelay."
-      Logs.error(e)
-    end
+    socket.tcp_nodelay = tcp_nodelay
   end
 
   def read(*args)
